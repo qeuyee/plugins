@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.RequiresApi;
@@ -173,6 +174,38 @@ class FlutterWebViewClient {
       public void onPageStarted(WebView view, String url, Bitmap favicon) {
         FlutterWebViewClient.this.onPageStarted(view, url);
       }
+      @Override
+      public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        FileInputStream input;
+        String url = request.getUrl().toString();
+        String key = "https://localfile";
+        if (url.contains(key)){
+            String localFilePath = url.replace(key, "");
+            try {
+                File file = new File(localFilePath);
+                input = new FileInputStream(file);
+                String mimeType = "image/jpg";
+                if (url.lastIndexOf(".jpg") != -1 || url.lastIndexOf(".jpeg") != -1){
+                    mimeType = "image/jpg";
+                } else if(url.lastIndexOf(".png") != -1){
+                    mimeType = "image/png";
+                } else if(url.lastIndexOf(".bmp") != -1){
+                    mimeType = "image/bmp";
+                } else if(url.lastIndexOf(".gif") != -1){
+                    mimeType = "image/gif";
+                } else if(url.lastIndexOf(".mp4") != -1 || url.lastIndexOf(".mpg4") != -1 || url.lastIndexOf(".m4v") != -1 || url.lastIndexOf(".mp4v") != -1){
+                    mimeType = "video/mp4";
+                } else if (url.lastIndexOf(".pdf") != -1){
+                    mimeType = "application/pdf";
+                }
+                WebResourceResponse response = new WebResourceResponse(mimeType,"UTF-8",input);
+                return response;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return super.shouldInterceptRequest(view, request);
+      }
 
       @Override
       public void onPageFinished(WebView view, String url) {
@@ -208,7 +241,39 @@ class FlutterWebViewClient {
       public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         return FlutterWebViewClient.this.shouldOverrideUrlLoading(view, request);
       }
-
+      //modified by qiuyi20200520 支持上传本地文件
+      @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        FileInputStream input;
+        String url = request.getUrl().toString();
+        String key = "https://localfile";
+        if (url.contains(key)){
+            String localFilePath = url.replace(key, "");
+            try {
+                File file = new File(localFilePath);
+                input = new FileInputStream(file);
+                String mimeType = "image/jpg";
+                if (url.lastIndexOf(".jpg") != -1 || url.lastIndexOf(".jpeg") != -1){
+                    mimeType = "image/jpg";
+                } else if(url.lastIndexOf(".png") != -1){
+                    mimeType = "image/png";
+                } else if(url.lastIndexOf(".bmp") != -1){
+                    mimeType = "image/bmp";
+                } else if(url.lastIndexOf(".gif") != -1){
+                    mimeType = "image/gif";
+                } else if(url.lastIndexOf(".mp4") != -1 || url.lastIndexOf(".mpg4") != -1 || url.lastIndexOf(".m4v") != -1 || url.lastIndexOf(".mp4v") != -1){
+                    mimeType = "video/mp4";
+                } else if (url.lastIndexOf(".pdf") != -1){
+                    mimeType = "application/pdf";
+                }
+                WebResourceResponse response = new WebResourceResponse(mimeType,"UTF-8",input);
+                return response;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return super.shouldInterceptRequest(view, request);
+    }
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         return FlutterWebViewClient.this.shouldOverrideUrlLoading(view, url);
